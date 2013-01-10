@@ -10,6 +10,11 @@ Created on Jan 1, 2011
 @contact: dbratcher@gatech.edu
 @summary: Contains tutorial for backtester and report.
 
+# Edited on January <9>,2013
+# @author: Grahesh Parkar
+# @summary: Editied part of code to read NSE dates
+# @Modified Line Nos: 34-40
+
 '''
 
 __version__ = "$Revision: 295 $"
@@ -25,7 +30,15 @@ import pandas as pd
 def _cache_dates():
     ''' Caches dates '''
     try:
-        filename = os.environ['QS'] + "/qstkutil/NYSE_dates.txt"
+        
+#   original code
+#        filename = os.environ['QS'] + "/qstkutil/NYSE_dates.txt"
+#   original code
+
+#   modified code to read NSE dates
+        filename = os.environ['QS'] + "/qstkutil/NSE_dates.txt"
+#   modified code
+        
     except KeyError:
         print "Please be sure to set the value for QS in config.sh or\n"
         print "in local.sh and then \'source local.sh\'.\n"
