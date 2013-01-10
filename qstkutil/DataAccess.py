@@ -10,6 +10,11 @@ Created on Jan 1, 2011
 @contact: shreyasj@gatech.edu
 @summary: Contains tutorial for backtester and report.
 
+# Edited on January <9>,2013
+# @author: Grahesh Parkar
+# @summary: Some part of Code modified to read NSE data
+# @Modified Line Nos: 59-61, 132-137, 237-243, 271-277, 305-311
+
 '''
 
 import numpy as np
@@ -50,7 +55,14 @@ class DataSource(object):
     COMPUSTAT="Compustat"
     CUSTOM="Custom"    
     MLT = "ML4Trading"
+    
+#    added code to set NSE datastore name
+    NSE="NSEData"
+#    added code
+
     #class DataSource ends
+    
+
 
 class DataAccess(object):
     '''
@@ -106,7 +118,7 @@ class DataAccess(object):
             #if DataSource.YAHOO ends
         elif (sourcein == DataSource.CUSTOM) :
             self.source = DataSource.CUSTOM
-            self.folderList.append(self.rootdir+"/Processed/Custom/")	
+            self.folderList.append(self.rootdir+"/Processed/Custom/")    
         
         elif (sourcein == DataSource.MLT) :
             self.source = DataSource.MLT
@@ -115,7 +127,14 @@ class DataAccess(object):
         elif (sourcein == DataSource.YAHOO) :
             self.source = DataSource.YAHOO
             self.folderList.append(self.rootdir+"/Yahoo/") 
-            self.fileExtensionToRemove=".csv"  
+            self.fileExtensionToRemove=".csv"
+            
+#   added code to read nse data
+        elif (sourcein == DataSource.NSE) :
+            self.source = DataSource.NSE
+            self.folderList.append(self.rootdir+"/NSEData/") 
+            self.fileExtensionToRemove=".csv"
+#   added code to read nse data    
             
         elif (sourcein == DataSource.COMPUSTAT):
             self.source= DataSource.COMPUSTAT
@@ -147,6 +166,7 @@ class DataAccess(object):
         '''
         
         ''' Now support lists of items, still support old string behaviour '''
+        
         bStr = False
         if( isinstance( data_item, str) ):
             data_item = [data_item]
@@ -214,7 +234,14 @@ class DataAccess(object):
                     #incorrect value
                     raise ValueError ("Incorrect value for data_item %s"%sItem)
 
-            if( self.source == DataSource.MLT or self.source == DataSource.YAHOO):
+#   original code
+#            if( self.source == DataSource.MLT or self.source == DataSource.YAHOO):
+#   original code
+
+#   modified code            
+            if( self.source == DataSource.MLT or self.source == DataSource.YAHOO or self.source == DataSource.NSE):
+#   modified code
+                
                 if (sItem == DataItem.OPEN):
                     list_index.append(1)
                 elif (sItem == DataItem.HIGH):
@@ -240,7 +267,15 @@ class DataAccess(object):
             symbol_ctr = symbol_ctr + 1
             #print self.getPathOfFile(symbol)
             try:
-                if (self.source == DataSource.CUSTOM) or (self.source == DataSource.MLT)or (self.source == DataSource.YAHOO):
+
+#   original code                
+#                if (self.source == DataSource.CUSTOM) or (self.source == DataSource.MLT)or (self.source == DataSource.YAHOO):
+#   original code
+
+#   modified code
+                if (self.source == DataSource.CUSTOM) or (self.source == DataSource.MLT)or (self.source == DataSource.YAHOO)or (self.source == DataSource.NSE):    
+#   modified code
+
                     file_path= self.getPathOfCSVFile(symbol);
                 else:
                     file_path= self.getPathOfFile(symbol);
@@ -266,7 +301,15 @@ class DataAccess(object):
             assert( not _file == None or bIncDelist == True )
             ''' Open the file only if we have a valid name, otherwise we need delisted data '''
             if _file != None:
-                if (self.source==DataSource.CUSTOM) or (self.source==DataSource.YAHOO)or (self.source==DataSource.MLT):
+
+#   origianl code
+#                if (self.source==DataSource.CUSTOM) or (self.source==DataSource.YAHOO)or (self.source==DataSource.MLT):
+#   original code
+
+#   modified code
+                if (self.source==DataSource.CUSTOM) or (self.source==DataSource.YAHOO)or (self.source==DataSource.MLT)or (self.source==DataSource.NSE):
+#   modified code
+
                     creader = csv.reader(_file)
                     row=creader.next()
                     row=creader.next()
@@ -438,6 +481,7 @@ class DataAccess(object):
         # the data has already been created and we can just read that file.
 
         # Create the hash for the symbols
+        
         hashsyms = 0
         for i in symbol_list:
             hashsyms = (hashsyms + hash(i)) % 10000000
@@ -472,7 +516,7 @@ class DataAccess(object):
             catchstall=dt.timedelta(hours=int(os.environ['CACHESTALLTIME']))
         except:
             catchstall=dt.timedelta(hours=1)
-
+        
         # Check if the file is older than the cachestalltime
         if os.path.exists(cachefilename):
             if ((dt.datetime.now()-dt.datetime.fromtimestamp(os.path.getmtime(cachefilename)))<catchstall):
@@ -493,14 +537,16 @@ class DataAccess(object):
                     if verbose:
                         print "error reading cache: " + cachefilename
                         print "recovering..."
-        if (readfile!=True):
-            if verbose:
+                        
+        if (readfile!=True):              
+            if verbose:                
                 print "cache miss"
                 print "beginning hardread"
             start = time.time() # start timer
-            if verbose:
+            if verbose:                
                 print "data_item(s): " + str(data_item)
                 print "symbols to read: " + str(symbol_list)
+                
             retval = self.get_data_hardread(ts_list, 
                 symbol_list, data_item, verbose, bIncDelist)
             elapsed = time.time() - start # end timer
@@ -554,7 +600,7 @@ class DataAccess(object):
         
     def getPathOfCSVFile(self, symbol_name):
         
-        for path1 in self.folderList:
+        for path1 in self.folderList:   
                 if (os.path.exists(str(path1)+str(symbol_name+".csv"))):
                     # Yay! We found it!
                     return (str(str(path1)+str(symbol_name)+".csv"))
