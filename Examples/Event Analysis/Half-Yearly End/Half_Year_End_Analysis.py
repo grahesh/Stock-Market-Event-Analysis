@@ -128,7 +128,7 @@ eventMatrix = findEvents(symbols,startday,endday,marketSymbol='NSE500',verbose=T
 eventMatrix.to_csv('eventmatrix.csv', sep=',')
 
 eventProfiler = ep.EventProfiler(eventMatrix,startday,endday,lookback_days=20,lookforward_days=20,verbose=True)
-#
+
 eventProfiler.study(filename="HalfYearEventStudy.jpg",plotErrorBars=True,plotMarketNeutral=True,plotEvents=False,marketSymbol='NSE500')
 
 
