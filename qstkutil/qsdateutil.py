@@ -131,9 +131,16 @@ def getLastOptionClose(day, trade_days):
         day= day - dt.timedelta(days=1)
     return(getNextOptionClose(day, trade_days))
 
+# original code
+#def getNYSEoffset(mark, offset):
+# original code
 
-def getNYSEoffset(mark, offset):
-    ''' Returns NYSE date offset by number of days '''
+# modified code    
+def getNSEoffset(mark, offset):
+# modified code
+
+    ''' Returns NSE date offset by number of days '''
+
     mark = mark.replace(hour=0, minute=0, second=0, microsecond=0)
     
     i = GTS_DATES.index.searchsorted(mark, side='right')
@@ -146,19 +153,25 @@ def getNYSEoffset(mark, offset):
     ret.replace(hour=16)
     return ret
 
+# original code
+#def getNYSEdays(startday = dt.datetime(1964,7,5), endday = dt.datetime(2020,12,31),
+#    timeofday = dt.timedelta(0)):
+# original code
 
-def getNYSEdays(startday = dt.datetime(1964,7,5), endday = dt.datetime(2020,12,31),
+# modified code
+def getNSEdays(startday = dt.datetime(1964,7,5), endday = dt.datetime(2020,12,31),
     timeofday = dt.timedelta(0)):
+# modified code        
     """
     @summary: Create a list of timestamps between startday and endday (inclusive)
-    that correspond to the days there was trading at the NYSE. This function
+    that correspond to the days there was trading at the NSE. This function
     depends on a separately created a file that lists all days since July 4,
-    1962 that the NYSE has been open, going forward to 2020 (based
-    on the holidays that NYSE recognizes).
+    1962 that the NSE has been open, going forward to 2020 (based
+    on the holidays that NSE recognizes).
 
     @param startday: First timestamp to consider (inclusive)
     @param endday: Last day to consider (inclusive)
-    @return list: of timestamps between startday and endday on which NYSE traded
+    @return list: of timestamps between startday and endday on which NSE traded
     @rtype datetime
     """
     start = startday - timeofday
@@ -170,19 +183,31 @@ def getNYSEdays(startday = dt.datetime(1964,7,5), endday = dt.datetime(2020,12,3
 
     return(ret)
 
-def getNextNNYSEdays(startday, days, timeofday):
+# original code
+#def getNextNNYSEdays(startday, days, timeofday):
+# original code
+
+def getNextNNSEdays(startday, days, timeofday):
+
     """
     @summary: Create a list of timestamps from startday that is days days long
-    that correspond to the days there was trading at  NYSE. This function
-    depends on the file used in getNYSEdays and assumes the dates within are
+    that correspond to the days there was trading at  NSE. This function
+    depends on the file used in getNYEdays and assumes the dates within are
     in order.
     @param startday: First timestamp to consider (inclusive)
     @param days: Number of timestamps to return
-    @return list: List of timestamps starting at startday on which NYSE traded
+    @return list: List of timestamps starting at startday on which NSE traded
     @rtype datetime
     """
     try:
-        filename = os.environ['QS'] + "/qstkutil/NYSE_dates.txt"
+#   original code
+#        filename = os.environ['QS'] + "/qstkutil/NYSE_dates.txt"
+#   original code
+
+#   modified code
+        filename = os.environ['QS'] + "/qstkutil/NSE_dates.txt"
+#   modified code
+        
     except KeyError:
         print "Please be sure to set the value for QS in config.sh or\n"
         print "in local.sh and then \'source local.sh\'.\n"
@@ -195,19 +220,34 @@ def getNextNNYSEdays(startday, days, timeofday):
                 dates.append(dt.datetime.strptime(i,"%m/%d/%Y")+timeofday)
     return(dates)
 
-def getPrevNNYSEday(startday, timeofday):
+# original code
+#def getPrevNNYSEday(startday, timeofday):
+# original code
+
+# modified code
+def getPrevNNSEday(startday, timeofday):
+# modified code
+    
     """
     @summary: This function returns the last valid trading day before the start
     day, or returns the start day if it is a valid trading day. This function
-    depends on the file used in getNYSEdays and assumes the dates within are
+    depends on the file used in getNSEdays and assumes the dates within are
     in order.
     @param startday: First timestamp to consider (inclusive)
     @param days: Number of timestamps to return
-    @return list: List of timestamps starting at startday on which NYSE traded
+    @return list: List of timestamps starting at startday on which NSE traded
     @rtype datetime
     """
     try:
-        filename = os.environ['QS'] + "/qstkutil/NYSE_dates.txt"
+
+#   original code        
+#        filename = os.environ['QS'] + "/qstkutil/NYSE_dates.txt"
+#   original code
+        
+#   modified code        
+        filename = os.environ['QS'] + "/qstkutil/NSE_dates.txt"
+#   modified code
+        
     except KeyError:
         print "Please be sure to set the value for QS in config.sh or\n"
         print "in local.sh and then \'source local.sh\'.\n"
@@ -257,9 +297,15 @@ def _trade_dates(dt_start, dt_end, s_period):
     @param dt_end: End date
     '''
 
-    ldt_timestamps = getNYSEdays(dt_start,
-                dt_end, dt.timedelta(hours=16) )
+# original code
+#    ldt_timestamps = getNYSEdays(dt_start,
+#                dt_end, dt.timedelta(hours=16) )
+# original code
 
+# modified code
+    ldt_timestamps = getNSEdays(dt_start,
+                dt_end, dt.timedelta(hours=16) )
+# modified code
 
     # Use pandas reindex method instead
     # Note, dates are index as well as values, we select based on index
