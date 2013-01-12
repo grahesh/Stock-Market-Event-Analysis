@@ -27,7 +27,7 @@ symbols = ["NSE","ABB.NS","ACC.NS","TCS.NS"]
 startday = dt.datetime(2008,1,1)
 endday = dt.datetime(2011,12,31)
 timeofday=dt.timedelta(hours=16)
-timestamps = du.getNYSEdays(startday,endday,timeofday)
+timestamps = du.getNSEdays(startday,endday,timeofday)
 
 #dataobj = da.DataAccess('Yahoo')
 

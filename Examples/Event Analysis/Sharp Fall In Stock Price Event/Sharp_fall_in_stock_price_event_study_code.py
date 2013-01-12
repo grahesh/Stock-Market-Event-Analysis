@@ -49,7 +49,7 @@ def findEvents(symbols, startday,endday, marketSymbol,verbose=False):
 
 	# Reading the Data for the list of Symbols.	
 	timeofday=dt.timedelta(hours=16)
-	timestamps = du.getNYSEdays(startday,endday,timeofday)
+	timestamps = du.getNSEdays(startday,endday,timeofday)
 	dataobj = da.DataAccess('NSEData')
 	if verbose:
             print __name__ + " reading data"
