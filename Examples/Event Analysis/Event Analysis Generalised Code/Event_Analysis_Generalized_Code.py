@@ -23,8 +23,9 @@ closefield = "close"
 volumefield = "volume"
 window = 10
 
-def getSymbols(data):
+def getSymbols(data, marketSymbol):
     symbols=[]
+    symbols.append(marketSymbol)
     for x in data:
         result=x.split(',')
         if(result[0]=="YES"):
@@ -60,7 +61,7 @@ def findEvents(data, startday,endday, marketSymbol,verbose=False):
         if verbose:
             print __name__ + " reading data"
         # Reading the Data
-        symbols=getSymbols(data)
+        symbols=getSymbols(data, marketSymbol)
         
         eventDetails=getDates(data)
         
