@@ -120,7 +120,6 @@ endday = dt.datetime(2012,12,30)
 
 
 # code ot access spreadsheet in google docs
-gc = gspread.login('stockeventstudy@gmail.com','stockmarketevent')
 
 sheetData = gc.open("NSEport").sheet1
 
