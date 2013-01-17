@@ -1,0 +1,71 @@
+Important Changes Done To the QSTK Framework
+
+QSTK framework Upload – 08-01-2013
+Uploaded entire QSTK framework on github.
+
+Updated code to read NSE dates from NSE_dates.txt file.
+File Modified: qstkutil/qsdateutil.py
+Modified and added code (line 34-40) to read NSE Data from NSE_dates.txt file. NSE_dates.txt file contains dates when NSE stock market was open. 
+
+Updated code to set NSE datasource and to save graphs to jpg format.
+File Modified: qstkstudy/EventProfiler.py
+Modified and added code (62-69) to read data from NSEData datasource.
+Modified and added code (183-189) to save graph in jpg format.
+
+Updated code to process data from NSE datasource.
+File Modified: qstkutil/DataAccess.py
+Added code (59-61) to initialize NSEData store. 
+Added code (132-137) to access NSEData store to access NSE stock files.
+Modified and added code (237-243) to access NSEData store to access NSE stock files.
+Modified and added code (271-277) to access NSEData store to access NSE stock files.
+Modified and added code (305-311) to access NSEData store to access NSE stock files.
+
+Simple Plots To Analyze NSE India Stocks
+File Added: Examples/Event Analysis/Stock Details/NSE_India.py
+Above file added that plots basic graphs to analyse stocks.
+
+Financial Year End Event Analysis
+
+File Added: Examples/Event Analysis/Financial Year End/Financial_Year_End_Analysis.py
+
+File added to analyse the stocks mentioned in NSE500port.csv during end of financial year.
+
+Half Year Event Analysis. …
+File Added: Examples/Event Analysis/Half-Yearly End/Half_Year_End_Analysis.py
+File added to analyse the mentioned stocks in NSE500 during half year events.
+
+
+Month End Event Analysis of Stocks
+File Added: Examples/Event Analysis/Month End Event Analysis/month_end_event_analysis.py
+File added to analyse the stocks in NSE500.csv at the end of month.
+
+Quarter End Event Analysis of NSE stocks
+File Added:  Examples/Event Analysis/Quarter End/Quater_End_Analysis.py
+File added to analyse the mentioned stocks in NSE500 during quarter end events.
+
+Sharp Fall in Stock Price Event Study Code
+File Added: Examples/Event Analysis/Sharp Fall In Stock Price Event/Sharp_fall_in_stock_price_event_study_code.py
+File added to analyse the mentioned stocks in NSE500 during sharp fall in their price.
+
+QSData 
+File Added: QSData/Yahoo/    -    NYSE stock files
+File Added: QSData/NSEData/   -   NSE stock files
+Added Data Repository from where data is accessed for processing.
+
+Generalized Code To Study Events.
+File Added:  Examples/Event Analysis/Event Analysis Generalised Code/Event_Analysis_Generalized_
+The code accepts event dates and stock names from input NSEPort.csv file
+and analysis studies the stocks on event days.
+
+NSE Dates file upload.
+File Added: qstkutil/NSE_dates.txt
+Uploaded NSE_Dates.txt file that contains dates when NSE was open.
+
+Modification of Data and adding NSE C&X 100 stocks list.
+File Modified: Examples/Event Analysis
+Added csv file NSE_C&X100 file to all event analysis codes to analyse NSE 100 stocks.
+
+Sharp fall in stock price at end of month
+File Added: Examples\Event Analysis\Sharp Fall In Stock Price At End of Month Event/Sharp_fall_in_stock_price_end_of_month_event_study_code.py
+
+Code to analyze sharp fall in stock price at the end of the month.
