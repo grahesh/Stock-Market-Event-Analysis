@@ -1,0 +1,57 @@
+Start_Date,Starting Date Of Time Frame (yyyy-mm-dd),Mandatory
+End_Date,Ending Date Of Time Frame (yyyy-mm-dd),Mandatory
+Benchmark,"Market Symbol (eg. NSE, NSE500, NSE100)",Mandatory
+LookBack_Days,Days To Be Analyzed Before Event Day (5 or 10),Mandatory
+LookForward_Days,Days To Be Analyzed After Event Day (5 or 10),Mandatory
+Columns,Column Names from Stock_Event_Details_File To Be Analyzed.,"ALL (Use All Columns) / NA (No Columns) / Column Names (Col_1, Col_2)"
+File_Key,Key Of Stock_Event_Details_File To Be Analyzed.,Mandatory
+Market_Change,Fall/Rise in Market Price Condition To Analyze Events (eg. <-0.01 or >+0.01),"NA (No Value) / Value ('+' or '-' to indicate fall or rise in value) (0.01=1%, 1.0=100%)"
+Stock_Change,Fall/Rise in Stock Price Condition To Analyze Events (eg. <-0.01 or >+0.01),"NA (No Value) / Value ('+' or '-' to indicate fall or rise in value) (0.01=1%, 1.0=100%)"
+Market_Change_Min,Minimum Value Of Fall/Rise in Market Price Condition To Analyze Events (eg. -0.01 or +0.01),"NA (No Value) / Value (0.01=1%, 1.0=100%)"
+Market_Change_Max,Maximum Value Of Fall/Rise in Market Price Condition To Analyze Events (eg. -0.01 or +0.01),"NA (No Value) / Value (0.01=1%, 1.0=100%)"
+Stock_Change_Min,Minimum Value Of Fall/Rise in Stock Price Condition To Analyze Events (eg. -0.01 or +0.01),"NA (No Value) / Value (0.01=1%, 1.0=100%)"
+Stock_Change_Max,Maximum Value Of Fall/Rise in Stock Price Condition To Analyze Events (eg. -0.01 or +0.01),"NA (No Value) / Value (0.01=1%, 1.0=100%)"
+Save_File_Name,File Name To Save Event analysis Results,Mandatory
+END,Marks The End Of An Event Study,Mandatory
+,,
+,,
+Important Points To Remember: ,,
+"1. If Columns value is NA, then only stock names will be analysed based on conditions of market change values.",,
+2. Market_Change and Stock_Change values can be entered both or any one.,,
+3. Market_Change_Min and Market_Change_Max should both be entered as the stock values will be analysed in that range. Same for Stock_Change_Min and Stock_Change_Min.,,
+4. Market_Change range values and Stock_Change range values can be entered both or any one.,,
+5. If Stock_Cahnge or Market_Change are entered then Market_Change range values and Stock_Change range values should not be entered and vice-versa,,
+,,
+,,
+Example : ,,
+,,
+Start_Date,15-12-2011,
+End_Date,31-12-2012,
+Benchmark,NSE100,
+LookBack_Days,10,
+LookForward_Days,10,
+Columns,NA,
+File_Key,0AjoNUMfP67sMdFE5Qk5rZmgyazRSbVptbXJQUnRxd1E,
+Market_Change,<-0.01,
+Stock_Change,<-0.01,
+Market_Change_Min,NA,
+Market_Change_Max,NA,
+Stock_Change_Min,NA,
+Stock_Change_Max,NA,
+Save_File_Name,Without_Columns,
+END,,
+Start_Date,15-01-2011,
+End_Date,31-12-2012,
+Benchmark,NSE100,
+LookBack_Days,10,
+LookForward_Days,10,
+Columns,ALL,
+File_Key,0AjoNUMfP67sMdDA4RjQ0Y3BDSDJzdFoyU19Qa1pkbWc,
+Market_Change,<-0.01,
+Stock_Change,<-0.01,
+Market_Change_Min,NA,
+Market_Change_Max,NA,
+Stock_Change_Min,NA,
+Stock_Change_Max,NA,
+Save_File_Name,With_Columns,
+END,,
