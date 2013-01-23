@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jan 21 10:55:19 2013
+Created on Mon Jan 20 10:55:19 2013
 
 @author: Grahesh Parkar
 """
@@ -16,10 +16,9 @@ import qstkutil.DataAccess as da
 import qstkutil.tsutil as tsu
 import qstkstudy.EventProfiler as ep
 import requests
+import csv
 
 class EventAnalysis():
-
-    # initializes all values from config file.
 
     def __init__(self, configData, eventDetailsData):
 
@@ -59,12 +58,14 @@ class EventAnalysis():
         self.stockChangeMax=configData['Stock_Change_Max']
 
         self.noColumns=False
-
         if(self.columns[0] == 'NA'):
             self.noColumns=True
 
+        self.analyzeLookbackDays=False
+        if(configData['Analyze_LookBack_Days']=='Y'):
+            self.analyzeLookbackDays=True
 
-# formats the stock details file data into array of stock names and dates to be analyzed format
+
     def getDates(self, eventData, NSEtimestamps, columnIndexes):
         modifiedDates=[]
         for row in range(1, len(eventData)):
@@ -72,12 +73,12 @@ class EventAnalysis():
             if(eventData[row][0]=="Y"):
                 tempData.append(eventData[row][1])
 
-                if(self.noColumns): # if only stock names without mentioned dates needs to be analyzed
+                if(self.noColumns):
                     for time in NSEtimestamps:
                         tempData.append(time)
 
                 else:
-                    for i in range(2,len(eventData[row])): # if stock names on specified dates needs to be analyzed
+                    for i in range(2,len(eventData[row])):
                         if(eventData[row].index(eventData[row][i]) in columnIndexes):
                             y=eventData[row][i].split('-')
                             newDate=dt.datetime(int(y[0]),int(y[1]),int(y[2]))+dt.timedelta(hours=16)
@@ -90,7 +91,6 @@ class EventAnalysis():
         return modifiedDates
 
 
-# gets stock symbols that needs to be analyzed mentioned in stock details file.
     def getSymbols(self):
         eventData=self.eventDetailsData
         symbols=[]
@@ -100,8 +100,6 @@ class EventAnalysis():
                 symbols.append(eventData[row][1])
         return symbols
 
-
-# creates event matrix when conditions (eg. fall in stock price or fall in market) is given.
     def getValueChangeMatrix(self, stockDates, NSEValues, mktneutDM, eventMatrix):
         if(self.marketValueChange!='NA'):
             if(self.marketValueChange[0]=='<'):
@@ -151,8 +149,6 @@ class EventAnalysis():
         return eventMatrix
 
 
-
-# creates event matrix when range of condition (eg. fall in stock price in range of 2 numbers is given)
     def getRangeChangeMatrix(self, stockDates, NSEValues, mktneutDM, eventMatrix):
         if(self.marketChangeMin!='NA' and self.marketChangeMax!='NA' and self.stockChangeMin!='NA' and self.stockChangeMax!='NA'):
             for stock in stockDates:
@@ -160,6 +156,7 @@ class EventAnalysis():
                 for i in range(1,len(stock)):
                     if NSEValues[stock[i]] < float(self.marketChangeMax) and NSEValues[stock[i]] > float(self.marketChangeMin) and mktneutDM[stockName][stock[i]] < float(self.stockChangeMax) and mktneutDM[stockName][stock[i]] > float(self.stockChangeMin) :
                         eventMatrix[stockName][stock[i]] = 1.0  #overwriting by the bit, marking the event
+
 
         elif(self.marketChangeMin!='NA' and self.marketChangeMax!='NA'):
             for stock in stockDates:
@@ -177,8 +174,29 @@ class EventAnalysis():
         return eventMatrix
 
 
+    def analyzeStock(self, symbol, idx, stockDates, mktneutDM):
+        result=False
+        if(idx > self.lookBackDays):
+            sum=0
+            for i in range(idx-self.lookBackDays, idx):
+                sum+=mktneutDM[symbol][stockDates[i]]
 
-# gets the initial values that are required to calculate event matrix
+            if(self.stockValueChange!='NA'):
+                if(self.stockValueChange[0]=='<'):
+                    if(sum < float(self.stockValueChange[1:])):
+                        result=True
+                else:
+                    if(sum > float(self.stockValueChange[1:])):
+                        result=True
+
+            else:
+                if(sum < float(self.stockChangeMax) and sum > float(self.stockChangeMin)):
+                    print "range"
+                    result=True
+
+        return result
+
+
     def findEvents(self, symbols, columnIndexes, verbose=False):
 
         eventDetails=self.eventDetailsData
@@ -222,24 +240,31 @@ class EventAnalysis():
         # Event described is : Analysing Stock Prices before and after the occurence of an event.
         # Stocks are analysed on specific dates as per data provided in csv files accessed from Google Docs.
 
-        if((self.marketChangeMin!='NA' and self.marketChangeMax!='NA') or (self.stockChangeMin!='NA' and self.stockChangeMax!='NA')):
-            np_eventmat=self.getRangeChangeMatrix(stockDates, NSEValues, mktneutDM, np_eventmat)
-
-        elif(self.marketValueChange!='NA' or self.stockValueChange!='NA'):
-            np_eventmat=self.getValueChangeMatrix(stockDates, NSEValues, mktneutDM, np_eventmat)
-
-# creates event matrix when no condition is given.
-        else:
+        if(self.analyzeLookbackDays):
             for stock in stockDates:
                 stockName=stock[0]
                 for i in range(1,len(stock)):
-                    np_eventmat[stockName][stock[i]] = 1.0  #overwriting by the bit, marking the event
+                    if(self.analyzeStock(stockName, i, stock, mktneutDM)):
+                        np_eventmat[stockName][stock[i]] = 1.0  #overwriting by the bit, marking the event
+
+        else:
+
+            if((self.marketChangeMin!='NA' and self.marketChangeMax!='NA') or (self.stockChangeMin!='NA' and self.stockChangeMax!='NA')):
+                np_eventmat=self.getRangeChangeMatrix(stockDates, NSEValues, mktneutDM, np_eventmat)
+
+            elif(self.marketValueChange!='NA' or self.stockValueChange!='NA'):
+                np_eventmat=self.getValueChangeMatrix(stockDates, NSEValues, mktneutDM, np_eventmat)
+
+            else:
+                for stock in stockDates:
+                    stockName=stock[0]
+                    for i in range(1,len(stock)):
+                        np_eventmat[stockName][stock[i]] = 1.0  #overwriting by the bit, marking the event
 
         return np_eventmat
 
 
 
-# gets indexes of columns from stock details file that needs to be analyzed
     def getColumnIndexes(self):
         columnidx=[]
         if(self.columns[0]=='ALL'):
@@ -252,9 +277,14 @@ class EventAnalysis():
 
         return columnidx
 
+    def saveResult(self, eventMatrix):
+        cot=csv.writer(open(self.saveFileName+'_Result.csv','wb'))
+        for date, row in eventMatrix.T.iteritems():
+            for name, col in row.T.iteritems():
+                if(col==1.0):
+                    cot.writerow([date,name])
 
 
-# main function to analyze events
     def AnalyseEvents(self):
 
         columnIndexes=self.getColumnIndexes()
@@ -263,10 +293,18 @@ class EventAnalysis():
 
         eventMatrix=self.findEvents(stockSymbols, columnIndexes, verbose=True)
 
-        eventMatrix.to_csv(self.saveFileName+'_Event_Matrix'+'.csv', sep=',') # creates Event Matrix and saves as csv file
+        eventMatrix.to_csv(self.saveFileName+'_Event_Matrix'+'.csv', sep=',')
+
+        self.saveResult(eventMatrix)
+
         eventProfiler = ep.EventProfiler(eventMatrix,self.startday,self.endday,self.lookBackDays,self.lookForwardDays,verbose=True)
 
         eventProfiler.study(self.saveFileName+".jpg",plotErrorBars=True,plotMarketNeutral=True,plotEvents=False,marketSymbol=self.marketSymbol)
+
+        print 'Event Matrix generated saved as '+self.saveFileName+'_Event_Matrix.csv'
+        print 'Garph generated saved as '+self.saveFileName+'.jpg.'
+        print 'Result saved as '+self.saveFileName+'_Result.csv'
+
 
 
 
