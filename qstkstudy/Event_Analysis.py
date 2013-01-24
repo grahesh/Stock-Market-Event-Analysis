@@ -174,25 +174,27 @@ class EventAnalysis():
         return eventMatrix
 
 
-    def analyzeStock(self, symbol, idx, stockDates, mktneutDM):
+    def analyzeStock(self, symbol, stockDate, mktneutDM):
         result=False
-        if(idx > self.lookBackDays):
-            sum=0
-            for i in range(idx-self.lookBackDays, idx):
-                sum+=mktneutDM[symbol][stockDates[i]]
 
-            if(self.stockValueChange!='NA'):
-                if(self.stockValueChange[0]=='<'):
-                    if(sum < float(self.stockValueChange[1:])):
-                        result=True
-                else:
-                    if(sum > float(self.stockValueChange[1:])):
-                        result=True
+        for idx, row in enumerate(mktneutDM[symbol].values):
+            date = mktneutDM.index[idx]
 
-            else:
-                if(sum < float(self.stockChangeMax) and sum > float(self.stockChangeMin)):
-                    print "range"
-                    result=True
+            if(stockDate == date):
+                if(idx > self.lookBackDays):
+                    sum=0
+                    for i in range(idx-self.lookBackDays, idx):
+                        sum+=mktneutDM[symbol][i]
+                    if(self.stockValueChange!='NA'):
+                        if(self.stockValueChange[0]=='<'):
+                            if(sum < float(self.stockValueChange[1:])):
+                                result=True
+                        else:
+                            if(sum > float(self.stockValueChange[1:])):
+                                result=True
+                    else:
+                        if(sum < float(self.stockChangeMax) and sum > float(self.stockChangeMin)):
+                            result=True
 
         return result
 
@@ -244,7 +246,7 @@ class EventAnalysis():
             for stock in stockDates:
                 stockName=stock[0]
                 for i in range(1,len(stock)):
-                    if(self.analyzeStock(stockName, i, stock, mktneutDM)):
+                    if(self.analyzeStock(stockName, stock[i], mktneutDM)):
                         np_eventmat[stockName][stock[i]] = 1.0  #overwriting by the bit, marking the event
 
         else:
@@ -278,7 +280,8 @@ class EventAnalysis():
         return columnidx
 
     def saveResult(self, eventMatrix):
-        cot=csv.writer(open(self.saveFileName+'_Result.csv','wb'))
+        outputFile=open(self.saveFileName+'_Result.csv','wb')
+        cot=csv.writer(outputFile)
         for date, row in eventMatrix.T.iteritems():
             for name, col in row.T.iteritems():
                 if(col==1.0):
@@ -293,13 +296,12 @@ class EventAnalysis():
 
         eventMatrix=self.findEvents(stockSymbols, columnIndexes, verbose=True)
 
-        eventMatrix.to_csv(self.saveFileName+'_Event_Matrix'+'.csv', sep=',')
-
-        self.saveResult(eventMatrix)
-
         eventProfiler = ep.EventProfiler(eventMatrix,self.startday,self.endday,self.lookBackDays,self.lookForwardDays,verbose=True)
 
         eventProfiler.study(self.saveFileName+".jpg",plotErrorBars=True,plotMarketNeutral=True,plotEvents=False,marketSymbol=self.marketSymbol)
+
+        eventMatrix.to_csv(self.saveFileName+'_Event_Matrix'+'.csv', sep=',')
+        self.saveResult(eventMatrix)
 
         print 'Event Matrix generated saved as '+self.saveFileName+'_Event_Matrix.csv'
         print 'Garph generated saved as '+self.saveFileName+'.jpg.'
